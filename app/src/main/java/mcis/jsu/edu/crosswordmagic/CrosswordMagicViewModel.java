@@ -6,6 +6,7 @@ import android.content.Context;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -137,8 +138,57 @@ public class CrosswordMagicViewModel extends ViewModel {
             // Word object to the "wordMap" hash map; for the key names, use the box number
             // followed by the direction (for example, "16D" for Box # 16, Down).
 
-            puzzleHeight.setValue(15); // DELETE THIS!
-            puzzleWidth.setValue(15); // DELETE THIS!
+            line = br.readLine().trim();
+            fields = line.split("\t");
+
+            int hght = Integer.parseInt(fields[0]);
+            int wdth = Integer.parseInt(fields[1]);
+
+            puzzleHeight.setValue(hght);
+            puzzleWidth.setValue(wdth);
+
+        while(true){
+
+            //store next line and check if it's null.
+            line = br.readLine();
+            if (line == null){break;}
+
+            //StringBuilder for assembling HashMap key strings.
+            StringBuilder key = new StringBuilder();
+
+            //store the information for the current line in the file.
+            //trim and split the line into a clean string array.
+            line = line.trim();
+            fields = line.split("\t");
+
+            //instantiate a new Word with the fields.
+            Word word = new Word(fields);
+
+            //store relevant values in variables for proper processing of the current word.
+            int box = word.getBox();
+            String dir = word.getDirection();
+            String clue = word.getClue();
+
+            //construct the key for the hashmap using the box number and direction
+            key.append(box);
+            key.append(dir);
+
+            switch(dir) {
+                case "A":
+                    aString.append("" + box + ":" + clue + "\n");
+                    break;
+
+                case "D":
+                    dString.append("" + box + ":" + clue + "\n");
+                    break;
+
+                default:
+                    System.out.println("Word '" + word.getWord() + "' had no valid direction. See method 'getPuzzleData()' in CrosswordMagicViewModel.java or check puzzle files.");
+                    break;
+            }
+
+            wordMap.put(key.toString(), word);
+        }
 
         } catch (Exception e) {}
 
@@ -149,6 +199,7 @@ public class CrosswordMagicViewModel extends ViewModel {
         Character[][] aLetters = new Character[puzzleHeight.getValue()][puzzleWidth.getValue()];
         Integer[][] aNumbers = new Integer[puzzleHeight.getValue()][puzzleWidth.getValue()];
 
+            // INSERT YOUR CODE HERE
         for (int i = 0; i < aLetters.length; ++i) {
             Arrays.fill(aLetters[i], '*');
         }
@@ -160,8 +211,21 @@ public class CrosswordMagicViewModel extends ViewModel {
         for (HashMap.Entry<String, Word> e : wordMap.entrySet()) {
 
             Word w = e.getValue();
+            int r = w.getRow();
+            int c = w.getColumn();
+            char[] chars = w.getWord().toCharArray();
 
-            // INSERT YOUR CODE HERE
+            aNumbers[r][c] = w.getBox();
+
+            for(int i = 0; i < chars.length; i++){
+                if (w.isAcross()){aLetters[r][c+i] = ' ';} //chars[i];} These omissions for checking that puzzle is correctly assmebled.
+                if (w.isDown()){aLetters[r+i][c] =  ' ';}//chars[i];} These omissions for checking that puzzle is correctly assmebled.
+                else{System.out.println("Word with no valid direction found in wordMap.");}
+
+            }
+
+
+
 
         }
 
