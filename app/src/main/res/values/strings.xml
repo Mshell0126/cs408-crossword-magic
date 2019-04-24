@@ -3,4 +3,6 @@
     <string name="action_settings">Settings</string>
     <string name="across">Across:</string>
     <string name="down">Down:</string>
+    <string name="input_dialogue_title">Guess for entry %1$d (Across or Down):</string>
+    <string name="input_dialogue_message">Please enter your guess.</string>
 </resources>

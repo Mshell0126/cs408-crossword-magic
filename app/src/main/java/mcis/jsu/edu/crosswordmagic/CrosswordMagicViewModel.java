@@ -216,10 +216,10 @@ public class CrosswordMagicViewModel extends ViewModel {
             char[] chars = w.getWord().toCharArray();
 
             aNumbers[r][c] = w.getBox();
-
+            //System.out.println(w.isAcross());
             for(int i = 0; i < chars.length; i++){
                 if (w.isAcross()){aLetters[r][c+i] = ' ';} //chars[i];} These omissions for checking that puzzle is correctly assmebled.
-                if (w.isDown()){aLetters[r+i][c] =  ' ';}//chars[i];} These omissions for checking that puzzle is correctly assmebled.
+                else if (w.isDown()){aLetters[r+i][c] =  ' ';}//chars[i];} These omissions for checking that puzzle is correctly assmebled.
                 else{System.out.println("Word with no valid direction found in wordMap.");}
 
             }
@@ -231,6 +231,37 @@ public class CrosswordMagicViewModel extends ViewModel {
 
         this.letters.setValue(aLetters);
         this.numbers.setValue(aNumbers);
+
+    }
+    /*
+    *returns the String version of a Word object in uppercase.
+    * for returning the word as a Word object, please use "getWords"
+    * */
+    public String getWord(int box, String dir){
+        HashMap<String, Word> words = getWords();
+        Word w = words.get("" + String.valueOf(box) + dir);
+        if(w == null){
+            System.out.println("" + box + " " + dir + " was null");
+            return "";
+        }
+        String s = w.getWord().toUpperCase();
+        //System.out.println(s);
+        return s;
+    }
+
+    public void addWordToGrid(int box, String dir){
+        Character[][] updateGrid = letters.getValue();
+        Word w = getWords().get("" + String.valueOf(box) + dir);
+        int r = w.getRow();
+        int c = w.getColumn();
+        char[] chars = w.getWord().toCharArray();
+        for(int i = 0; i < chars.length; i ++){
+            System.out.println(i);
+            System.out.println(chars[i]);
+            if(w.isAcross()){updateGrid[r][c + i] = chars[i];}
+            else if(w.isDown()){updateGrid[r + i][c] = chars[i];}
+        }
+        this.letters.setValue(updateGrid);
 
     }
 

@@ -1,17 +1,22 @@
 package mcis.jsu.edu.crosswordmagic;
 
+import android.app.AlertDialog;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.GridLayout;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 
 import java.util.HashMap;
 
@@ -21,6 +26,8 @@ public class PuzzleFragmentView extends Fragment implements View.OnClickListener
     private CrosswordMagicViewModel model;
 
     public PuzzleFragmentView() {}
+
+    public String userInput = "";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -197,6 +204,11 @@ public class PuzzleFragmentView extends Fragment implements View.OnClickListener
 
     }
 
+    public void setUserInput(String s) {
+        System.out.println(s);
+        this.userInput = s;
+    }
+
     @Override
     public void onClick(View v) {
 
@@ -217,17 +229,49 @@ public class PuzzleFragmentView extends Fragment implements View.OnClickListener
         Integer[][] numbers = model.getNumbers();
 
         /* Was a number clicked?  If so, display it in a Toast */
+        int boxNo = numbers[row][col];
+        if (boxNo != 0) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(getString(R.string.input_dialogue_title, boxNo));
+            builder.setMessage(R.string.input_dialogue_message);
+            final EditText input = new EditText(getActivity());
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            builder.setView(input);
+            builder.setPositiveButton("Check it!", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface d, int i) {
+                    userInput = input.getText().toString().toUpperCase();
+                    System.out.println("hewwo?");
+                }
+            });
+            builder.setNegativeButton("nvm...", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface d, int i) {
+                    userInput = "";
+                    d.cancel();
+                }
+            });
+            AlertDialog inputDialog = builder.show();
+            try {
+                if (model.getWord(boxNo, "A").equals(userInput)) {
+                    model.addWordToGrid(boxNo, "A");
+                } else if (model.getWord(boxNo, "D").equals(userInput)) {
+                    model.addWordToGrid(boxNo, "D");
+                } else {
+                    Toast toast = Toast.makeText(getContext(), "...guess does not match down or across...", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
 
-        if (numbers[row][col] != 0) {
+            }
+            catch(Exception e){System.err.print(e.toString());}
 
-            Toast toast=Toast.makeText(getContext(), "You have just tapped Square " + numbers[row][col], Toast.LENGTH_SHORT);
-            toast.show();
 
-            /* Add an "X" to Clicked Square */
+            /* Add an "X" to Clicked Square
 
             GridLayout squaresContainer = getActivity().findViewById(R.id.squaresContainer);
             TextView element = (TextView) squaresContainer.getChildAt(index);
             element.setText("X");
+            */
 
             /* Update Grid Contents */
 
