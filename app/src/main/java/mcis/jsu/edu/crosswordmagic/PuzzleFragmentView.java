@@ -27,13 +27,17 @@ public class PuzzleFragmentView extends Fragment implements View.OnClickListener
 
     public PuzzleFragmentView() {}
 
-    public String userInput = "";
+    public String userInput;// = "";
+    public boolean check;
+    //public int boxNo;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         model = ViewModelProviders.of(getActivity()).get(CrosswordMagicViewModel.class);
+        check = false;
+        userInput = "";
 
     }
 
@@ -204,10 +208,25 @@ public class PuzzleFragmentView extends Fragment implements View.OnClickListener
 
     }
 
-    public void setUserInput(String s) {
-        System.out.println(s);
-        this.userInput = s;
+    public void checkInput(int boxNo){
+        //check to see if the stored words are void THEN check to see if they match. Make toasts for the correct guess case.
+        try {
+            if (model.getWord(boxNo, "A").equals(userInput)) {
+                model.addWordToGrid(boxNo, "A");
+            } else if (model.getWord(boxNo, "D").equals(userInput)) {
+                model.addWordToGrid(boxNo, "D");
+            } else {
+                Toast toast = Toast.makeText(getContext(), "...guess does not match down or across...", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+
+        }
+        catch(Exception e){System.err.print(e.toString());}
+        check = false;
+        updatePuzzleView();
+
     }
+
 
     @Override
     public void onClick(View v) {
@@ -229,7 +248,7 @@ public class PuzzleFragmentView extends Fragment implements View.OnClickListener
         Integer[][] numbers = model.getNumbers();
 
         /* Was a number clicked?  If so, display it in a Toast */
-        int boxNo = numbers[row][col];
+        final int boxNo = numbers[row][col];
         if (boxNo != 0) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle(getString(R.string.input_dialogue_title, boxNo));
@@ -241,7 +260,7 @@ public class PuzzleFragmentView extends Fragment implements View.OnClickListener
                 @Override
                 public void onClick(DialogInterface d, int i) {
                     userInput = input.getText().toString().toUpperCase();
-                    System.out.println("hewwo?");
+                    checkInput(boxNo);
                 }
             });
             builder.setNegativeButton("nvm...", new DialogInterface.OnClickListener() {
@@ -252,30 +271,7 @@ public class PuzzleFragmentView extends Fragment implements View.OnClickListener
                 }
             });
             AlertDialog inputDialog = builder.show();
-            try {
-                if (model.getWord(boxNo, "A").equals(userInput)) {
-                    model.addWordToGrid(boxNo, "A");
-                } else if (model.getWord(boxNo, "D").equals(userInput)) {
-                    model.addWordToGrid(boxNo, "D");
-                } else {
-                    Toast toast = Toast.makeText(getContext(), "...guess does not match down or across...", Toast.LENGTH_SHORT);
-                    toast.show();
-                }
 
-            }
-            catch(Exception e){System.err.print(e.toString());}
-
-
-            /* Add an "X" to Clicked Square
-
-            GridLayout squaresContainer = getActivity().findViewById(R.id.squaresContainer);
-            TextView element = (TextView) squaresContainer.getChildAt(index);
-            element.setText("X");
-            */
-
-            /* Update Grid Contents */
-
-            updatePuzzleView();
 
         }
 
