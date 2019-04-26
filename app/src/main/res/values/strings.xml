@@ -5,4 +5,10 @@
     <string name="down">Down:</string>
     <string name="input_dialogue_title">Guess for entry %1$d (Across or Down):</string>
     <string name="input_dialogue_message">Please enter your guess.</string>
+    <string name="check_response_button">"Check it!"</string>
+    <string name="dismiss_dialog_button">nvm\u8230</string>
+    <string name="correct_across">Correct! %1$s is a match for %2$d across.</string>
+    <string name="correct_down">Correct! %1$s i a match for %2$d down.</string>
+    <string name="incorrect">%1$s does not match down or across</string>
+
 </resources>
